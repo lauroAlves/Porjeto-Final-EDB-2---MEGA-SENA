@@ -19,6 +19,38 @@ void print_concurso(Concurso* concurso) {
     }
 }
 
+void apresentar_estatisticas(HashTable* table) {
+    int freq[61] = {0};  // Frequência dos números sorteados (Mega-Sena tem números de 1 a 60)
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Concurso* atual = table->table[i];
+        while (atual != NULL) {
+            for (int j = 0; j < 6; j++) {
+                freq[atual->bolas[j]]++;
+            }
+            atual = atual->next;
+        }
+    }
+
+    printf("Estatísticas:\n");
+
+    // Dez números mais sorteados
+    printf("Dez Números Mais Sorteados:\n");
+    for (int i = 1; i <= 60; i++) {
+        if (freq[i] > 0) {
+            printf("Número %d: %d vezes\n", i, freq[i]);
+        }
+    }
+
+    // Dez números menos sorteados
+    printf("Dez Números Menos Sorteados:\n");
+    for (int i = 1; i <= 60; i++) {
+        if (freq[i] > 0) {
+            printf("Número %d: %d vezes\n", i, freq[i]);
+        }
+    }
+}
+
 void menu(HashTable* table) {
     int option;
     do {
@@ -28,7 +60,8 @@ void menu(HashTable* table) {
         printf("3. Remover Concurso\n");
         printf("4. Visualizar Todos os Concursos\n");
         printf("5. Carregar Concursos de um Arquivo\n");
-        printf("6. Sair\n");
+        printf("6. Apresentar Estatísticas\n");
+        printf("7. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &option);
 
@@ -69,12 +102,15 @@ void menu(HashTable* table) {
                 load_from_file(table, filename);
                 break;
             case 6:
+                apresentar_estatisticas(table);
+                break;
+            case 7:
                 printf("Saindo...\n");
                 break;
             default:
                 printf("Opção inválida!\n");
         }
-    } while (option != 6);
+    } while (option != 7);
 
     printf("Menu encerrado.\n");
 }
