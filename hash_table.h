@@ -22,4 +22,10 @@ void print_all(HashTable* table);
 void load_from_file(HashTable* table, const char* filename);
 void clear_table(HashTable* table);
 
+// Novas funções
+void quantidade_sorteios_numero(HashTable* table);
+void dez_numeros_mais_sorteados(HashTable* table);
+void dez_numeros_menos_sorteados(HashTable* table);
+void quantidade_concursos_ano(HashTable* table);
+
 #endif // HASH_TABLE_H

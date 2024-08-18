@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h> // Para usar INT_MAX
 #include "hash_table.h"
 
 static int hash_function(int numero) {
@@ -27,8 +28,9 @@ void clear_table(HashTable* table) {
 
 void insert(HashTable* table, Concurso concurso) {
     int index = hash_function(concurso.numero);
-    // Check for duplicates
     Concurso* current = table->table[index];
+    
+    // Check for duplicates
     while (current != NULL) {
         if (current->numero == concurso.numero) {
             printf("Concurso com o número %d já existe.\n", concurso.numero);
@@ -36,6 +38,7 @@ void insert(HashTable* table, Concurso concurso) {
         }
         current = current->next;
     }
+    
     // Insert new concurso
     Concurso* new_concurso = (Concurso*)malloc(sizeof(Concurso));
     *new_concurso = concurso;
@@ -59,6 +62,7 @@ void remove_concurso(HashTable* table, int numero) {
     int index = hash_function(numero);
     Concurso* current = table->table[index];
     Concurso* prev = NULL;
+    
     while (current != NULL) {
         if (current->numero == numero) {
             if (prev != NULL) {
@@ -117,4 +121,97 @@ void load_from_file(HashTable* table, const char* filename) {
     }
 
     fclose(file);
+}
+
+void quantidade_sorteios_numero(HashTable* table) {
+    int numero, count = 0;
+    printf("Digite o número a ser consultado: ");
+    scanf("%d", &numero);
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Concurso* current = table->table[i];
+        while (current != NULL) {
+            for (int j = 0; j < 6; j++) {
+                if (current->bolas[j] == numero) {
+                    count++;
+                }
+            }
+            current = current->next;
+        }
+    }
+    printf("O número %d foi sorteado %d vezes.\n", numero, count);
+}
+
+void dez_numeros_mais_sorteados(HashTable* table) {
+    int freq[61] = {0}; // Frequência de 1 a 60
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Concurso* current = table->table[i];
+        while (current != NULL) {
+            for (int j = 0; j < 6; j++) {
+                freq[current->bolas[j]]++;
+            }
+            current = current->next;
+        }
+    }
+
+    printf("Dez números mais sorteados:\n");
+    for (int i = 0; i < 10; i++) {
+        int max = 0, numero = 0;
+        for (int j = 1; j <= 60; j++) {
+            if (freq[j] > max) {
+                max = freq[j];
+                numero = j;
+            }
+        }
+        printf("Número %d: %d vezes\n", numero, max);
+        freq[numero] = 0; // Reseta o valor para encontrar o próximo maior
+    }
+}
+
+void dez_numeros_menos_sorteados(HashTable* table) {
+    int freq[61] = {0}; // Frequência de 1 a 60
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Concurso* current = table->table[i];
+        while (current != NULL) {
+            for (int j = 0; j < 6; j++) {
+                freq[current->bolas[j]]++;
+            }
+            current = current->next;
+        }
+    }
+
+    printf("Dez números menos sorteados:\n");
+    for (int i = 0; i < 10; i++) {
+        int min = INT_MAX, numero = 0;
+        for (int j = 1; j <= 60; j++) {
+            if (freq[j] < min && freq[j] > 0) {
+                min = freq[j];
+                numero = j;
+            }
+        }
+        printf("Número %d: %d vezes\n", numero, min);
+        freq[numero] = INT_MAX; // Seta para o valor máximo para não contar novamente
+    }
+}
+
+void quantidade_concursos_ano(HashTable* table) {
+    int ano, count = 0;
+    printf("Digite o ano a ser consultado (yyyy): ");
+    scanf("%d", &ano);
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Concurso* current = table->table[i];
+        while (current != NULL) {
+            int ano_concurso;
+            sscanf(current->data + 6, "%d", &ano_concurso); // Extrai o ano da data
+            if (ano_concurso == ano) {
+                printf("Número do Concurso: %d, Data: %s\n", current->numero, current->data);
+                count++;
+            }
+            current = current->next;
+        }
+    }
+    printf("Total de concursos no ano %d: %d\n", ano, count);
 }
