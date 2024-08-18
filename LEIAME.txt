@@ -1,0 +1,6 @@
+Projeto com apenas um componente. 
+Lauro Gabriel Alves Goes Silva 
+
+execução: 
+compila usando o make
+executa o código com ./main
